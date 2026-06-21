@@ -1,0 +1,55 @@
+{
+  "name": "@virtualsmslabs/mcp",
+  "version": "1.0.0",
+  "description": "MCP server for the VirtualSMS API — integrate SMS verification into any MCP-compatible IDE.",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "virtualsms-mcp": "build/index.js"
+  },
+  "files": [
+    "build",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node build/index.js",
+    "inspector": "npx @modelcontextprotocol/inspector node build/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "virtualsms",
+    "sms",
+    "sms-verification",
+    "sms-activation",
+    "virtual-number",
+    "phone-verification",
+    "claude",
+    "ai",
+    "llm"
+  ],
+  "author": "VirtualSMS Labs <contact@virtualsms.de>",
+  "license": "MIT",
+  "homepage": "https://github.com/VirtualSMSLabs/mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VirtualSMSLabs/mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VirtualSMSLabs/mcp/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3"
+  }
+}
