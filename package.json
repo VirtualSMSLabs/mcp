@@ -1,6 +1,6 @@
 {
   "name": "@virtualsmslabs/mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for the VirtualSMS API — integrate SMS verification into any MCP-compatible IDE.",
   "type": "module",
   "main": "build/index.js",
@@ -37,6 +37,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VirtualSMSLabs/mcp.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "bugs": {
     "url": "https://github.com/VirtualSMSLabs/mcp/issues"
