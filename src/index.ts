@@ -15,7 +15,7 @@ validateConfig();
 
 const server = new McpServer({
   name: "virtualsms-mcp",
-  version: "1.1.1",
+  version: "1.1.2",
 });
 
 registerBalanceTools(server);

@@ -1,6 +1,6 @@
 {
   "name": "@virtualsmslabs/mcp",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "MCP server for the VirtualSMS API — integrate SMS verification into any MCP-compatible IDE.",
   "type": "module",
   "main": "build/index.js",
