@@ -1,7 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { callApi, buildParams, isApiError, makeApiError } from "../client.js";
-import { ok, err } from "../types.js";
+import { getSharedClient } from "../shared-client.js";
+import { handleFormatError } from "./error-handler.js";
+import { ok } from "../types.js";
 
 const poolProviderSchema = z
   .enum(["alpha", "prime", "gamma", "zeta"])
@@ -28,16 +29,15 @@ export function registerPricingTools(server: McpServer): void {
     },
     async ({ service, country, poolProvider }) => {
       try {
-        const response = await callApi(
-          buildParams("getPrices", { service, country, poolProvider })
+        const client = getSharedClient();
+        const result = await client.getPrices(
+          service,
+          country ? parseInt(country, 10) : undefined,
+          poolProvider,
         );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -59,21 +59,16 @@ export function registerPricingTools(server: McpServer): void {
     },
     async ({ service, country, freePrice, poolProvider }) => {
       try {
-        const response = await callApi(
-          buildParams("getPricesExtended", {
-            service,
-            country,
-            freePrice,
-            poolProvider,
-          })
+        const client = getSharedClient();
+        const result = await client.getPricesExtended(
+          service,
+          country ? parseInt(country, 10) : undefined,
+          freePrice ?? null,
+          poolProvider,
         );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -93,16 +88,11 @@ export function registerPricingTools(server: McpServer): void {
     },
     async ({ service, poolProvider }) => {
       try {
-        const response = await callApi(
-          buildParams("getPricesVerification", { service, poolProvider })
-        );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.getPricesVerification(service, poolProvider);
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -120,16 +110,11 @@ export function registerPricingTools(server: McpServer): void {
     },
     async ({ service }) => {
       try {
-        const response = await callApi(
-          buildParams("getListOfTopCountriesByService", { service })
-        );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.getTopCountriesByService(service);
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );

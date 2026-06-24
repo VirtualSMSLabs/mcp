@@ -1,8 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { callApi, buildParams, isApiError, makeApiError } from "../client.js";
-import { parseActivation } from "../parser.js";
-import { ok, err } from "../types.js";
+import { getSharedClient } from "../shared-client.js";
+import { handleFormatError } from "./error-handler.js";
+import { ok } from "../types.js";
 
 const orderNumberSchema = {
   service: z.string().describe("Service code (required, e.g. 'tg' for Telegram)"),
@@ -56,16 +56,26 @@ export function registerOrderingTools(server: McpServer): void {
     },
     async (params) => {
       try {
-        const response = await callApi(
-          buildParams("getNumber", params as Record<string, string | number | boolean | undefined>)
+        const client = getSharedClient();
+        const result = await client.getNumber(
+          params.service,
+          parseInt(params.country, 10),
+          {
+            maxPrice: params.maxPrice,
+            operator: params.operator,
+            forward: params.forward === "1" ? true : params.forward === "0" ? false : undefined,
+            phoneException: params.phoneException,
+            activationType: params.activationType ? parseInt(params.activationType, 10) : undefined,
+            language: params.language,
+            ref: params.ref,
+            useCashBack: params.useCashBack === "true" ? true : params.useCashBack === "false" ? false : undefined,
+            userId: params.userId,
+            poolProvider: params.poolProvider,
+          },
         );
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        const parsed = parseActivation(response.raw);
-        return ok(parsed);
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -85,16 +95,27 @@ export function registerOrderingTools(server: McpServer): void {
     },
     async (params) => {
       try {
-        const response = await callApi(
-          buildParams("getNumberV2", params as Record<string, string | number | boolean | undefined>)
+        const client = getSharedClient();
+        const result = await client.getNumberV2(
+          params.service,
+          parseInt(params.country, 10),
+          {
+            maxPrice: params.maxPrice,
+            operator: params.operator,
+            orderId: params.orderId,
+            forward: params.forward === "1" ? true : params.forward === "0" ? false : undefined,
+            phoneException: params.phoneException,
+            activationType: params.activationType ? parseInt(params.activationType, 10) : undefined,
+            language: params.language,
+            ref: params.ref,
+            useCashBack: params.useCashBack === "true" ? true : params.useCashBack === "false" ? false : undefined,
+            userId: params.userId,
+            poolProvider: params.poolProvider,
+          },
         );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );

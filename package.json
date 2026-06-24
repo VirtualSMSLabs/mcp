@@ -1,6 +1,6 @@
 {
   "name": "@virtualsmslabs/mcp",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "MCP server for the VirtualSMS API — integrate SMS verification into any MCP-compatible IDE.",
   "type": "module",
   "main": "build/index.js",
@@ -16,6 +16,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node build/index.js",
+    "test": "bun test tests/",
     "inspector": "npx @modelcontextprotocol/inspector node build/index.js"
   },
   "keywords": [
@@ -33,13 +34,13 @@
   ],
   "author": "VirtualSMS Labs <contact@virtualsms.de>",
   "license": "MIT",
-  "homepage": "https://github.com/VirtualSMSLabs/mcp#readme",
+  "homepage": "https://www.npmjs.com/package/@virtualsmslabs/mcp",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VirtualSMSLabs/mcp.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "bugs": {
     "url": "https://github.com/VirtualSMSLabs/mcp/issues"
@@ -49,6 +50,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "@virtualsmslabs/js-sdk": "^1.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

@@ -1,7 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { callApi, buildParams, isApiError, makeApiError } from "../client.js";
-import { ok, err } from "../types.js";
+import { getSharedClient } from "../shared-client.js";
+import { handleFormatError } from "./error-handler.js";
+import { ok } from "../types.js";
 
 export function registerInfoTools(server: McpServer): void {
   server.registerTool(
@@ -26,17 +27,15 @@ export function registerInfoTools(server: McpServer): void {
     },
     async ({ country, operator, poolProvider }) => {
       try {
-        const response = await callApi(
-          buildParams("getNumbersStatus", { country, operator, poolProvider })
+        const client = getSharedClient();
+        const result = await client.getNumbersStatus(
+          country ? parseInt(country, 10) : undefined,
+          operator,
+          poolProvider,
         );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          const apiErr = makeApiError(response.raw);
-          return ok(apiErr);
-        }
-        return ok({ raw: response.raw });
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -55,17 +54,11 @@ export function registerInfoTools(server: McpServer): void {
     },
     async ({ poolProvider }) => {
       try {
-        const response = await callApi(
-          buildParams("getCountries", { poolProvider })
-        );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          const apiErr = makeApiError(response.raw);
-          return ok(apiErr);
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.getCountries(poolProvider);
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -80,25 +73,22 @@ export function registerInfoTools(server: McpServer): void {
           .string()
           .optional()
           .describe("Country ID to filter services (e.g. '39')"),
-        poolProvider: z
-          .enum(["alpha", "prime", "gamma", "zeta"])
+        lang: z
+          .string()
           .optional()
-          .describe("Provider alias. Overrides the VIRTUALSMS_POOL_PROVIDER env var."),
+          .describe("Language for service names (e.g. 'en', 'pt')"),
       },
     },
-    async ({ country, poolProvider }) => {
+    async ({ country, lang }) => {
       try {
-        const response = await callApi(
-          buildParams("getServicesList", { country, poolProvider })
+        const client = getSharedClient();
+        const result = await client.getServicesList(
+          country ? parseInt(country, 10) : undefined,
+          lang,
         );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          const apiErr = makeApiError(response.raw);
-          return ok(apiErr);
-        }
-        return ok({ raw: response.raw });
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -120,17 +110,14 @@ export function registerInfoTools(server: McpServer): void {
     },
     async ({ country, poolProvider }) => {
       try {
-        const response = await callApi(
-          buildParams("getOperators", { country, poolProvider })
+        const client = getSharedClient();
+        const result = await client.getOperators(
+          parseInt(country, 10),
+          poolProvider,
         );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          const apiErr = makeApiError(response.raw);
-          return ok(apiErr);
-        }
-        return ok({ raw: response.raw });
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );

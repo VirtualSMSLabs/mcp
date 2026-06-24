@@ -9,12 +9,13 @@ import { registerPricingTools } from "./tools/pricing.js";
 import { registerOrderingTools } from "./tools/ordering.js";
 import { registerActivationTools } from "./tools/activation.js";
 import { registerNotificationTools } from "./tools/notifications.js";
+import { registerRateLimitTools } from "./tools/rate-limit-register.js";
 
 validateConfig();
 
 const server = new McpServer({
   name: "virtualsms-mcp",
-  version: "1.0.0",
+  version: "1.1.0",
 });
 
 registerBalanceTools(server);
@@ -23,6 +24,7 @@ registerPricingTools(server);
 registerOrderingTools(server);
 registerActivationTools(server);
 registerNotificationTools(server);
+registerRateLimitTools(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

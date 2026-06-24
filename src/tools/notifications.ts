@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { callApi, buildParams, isApiError, makeApiError } from "../client.js";
-import { ok, err } from "../types.js";
+import { getSharedClient } from "../shared-client.js";
+import { handleFormatError } from "./error-handler.js";
+import { ok } from "../types.js";
 
 export function registerNotificationTools(server: McpServer): void {
   server.registerTool(
@@ -13,14 +13,11 @@ export function registerNotificationTools(server: McpServer): void {
     },
     async () => {
       try {
-        const response = await callApi(buildParams("getNotifications"));
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.getNotifications();
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );

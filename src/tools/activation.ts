@@ -1,12 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { callApi, buildParams, isApiError, makeApiError } from "../client.js";
-import {
-  parseStatus,
-  parseSetStatus,
-  parseActivation,
-} from "../parser.js";
-import { ok, err } from "../types.js";
+import { getSharedClient } from "../shared-client.js";
+import { handleFormatError } from "./error-handler.js";
+import { ok } from "../types.js";
 
 export function registerActivationTools(server: McpServer): void {
   server.registerTool(
@@ -18,14 +14,11 @@ export function registerActivationTools(server: McpServer): void {
     },
     async () => {
       try {
-        const response = await callApi(buildParams("getActiveActivations"));
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.getActiveActivations();
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -43,16 +36,11 @@ export function registerActivationTools(server: McpServer): void {
     },
     async ({ id }) => {
       try {
-        const response = await callApi(
-          buildParams("checkExtraActivation", { id })
-        );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.checkExtraActivation(parseInt(id, 10));
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -70,16 +58,11 @@ export function registerActivationTools(server: McpServer): void {
     },
     async ({ id }) => {
       try {
-        const response = await callApi(
-          buildParams("getExtraActivation", { id })
-        );
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        const parsed = parseActivation(response.raw);
-        return ok(parsed);
+        const client = getSharedClient();
+        const result = await client.getExtraActivation(parseInt(id, 10));
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -98,16 +81,14 @@ export function registerActivationTools(server: McpServer): void {
     },
     async ({ id, status }) => {
       try {
-        const response = await callApi(
-          buildParams("setStatus", { id, status })
+        const client = getSharedClient();
+        const result = await client.setStatus(
+          parseInt(id, 10),
+          parseInt(status, 10),
         );
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        const parsed = parseSetStatus(response.raw);
-        return ok(parsed);
+        return ok({ success: true, action: result });
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -123,16 +104,11 @@ export function registerActivationTools(server: McpServer): void {
     },
     async ({ id }) => {
       try {
-        const response = await callApi(
-          buildParams("getStatus", { id })
-        );
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        const parsed = parseStatus(response.raw);
-        return ok(parsed);
+        const client = getSharedClient();
+        const result = await client.getStatus(parseInt(id, 10));
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );
@@ -148,16 +124,11 @@ export function registerActivationTools(server: McpServer): void {
     },
     async ({ id }) => {
       try {
-        const response = await callApi(
-          buildParams("getStatusV2", { id })
-        );
-        if (response.isJson && response.json) return ok(response.json);
-        if (isApiError(response.raw)) {
-          return ok(makeApiError(response.raw));
-        }
-        return ok({ raw: response.raw });
+        const client = getSharedClient();
+        const result = await client.getStatusV2(parseInt(id, 10));
+        return ok(result);
       } catch (e) {
-        return err(e instanceof Error ? e.message : String(e));
+        return handleFormatError(e);
       }
     }
   );

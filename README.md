@@ -12,13 +12,13 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that 
 
 ## What This MCP Server Does
 
-This MCP server exposes **18 tools** that map 1:1 to the VirtualSMS Consumer API actions. It normalizes the API's mixed text/JSON responses into clean structured JSON that LLMs can reason about.
+This MCP server exposes **19 tools** that map 1:1 to the VirtualSMS Consumer API actions. It normalizes the API's mixed text/JSON responses into clean structured JSON that LLMs can reason about.
 
 ### Tool Categories
 
 | Category | Tools | Purpose |
 |----------|-------|---------|
-| **Account** | `get_balance` | Check account balance |
+| **Account** | `get_balance`, `get_rate_limit_info` | Check account balance and rate limit status |
 | **Information & Pricing** | `get_numbers_status`, `get_countries`, `get_services_list`, `get_operators`, `get_prices`, `get_prices_extended`, `get_prices_verification`, `get_top_countries_by_service` | Browse availability, services, and pricing |
 | **Ordering** | `order_number`, `order_number_v2` | Purchase virtual phone numbers |
 | **Activation Management** | `get_active_activations`, `check_extra_activation`, `get_extra_activation`, `set_activation_status`, `get_activation_status`, `get_activation_status_v2` | Manage ordered numbers and retrieve SMS codes |
@@ -78,6 +78,13 @@ If `VIRTUALSMS_POOL_PROVIDER` is not set, the platform auto-routes to the best a
 Get current account balance.
 - **Parameters:** None
 - **Returns:** `{ balance: number }`
+
+#### `get_rate_limit_info`
+Get rate limit information from the most recent API call.
+- **Parameters:** None
+- **Returns:** `{ rateLimit: { limit: number, remaining: number } | null }`
+
+Returns `null` if no API call has been made yet or the API did not return rate limit headers. The `limit` is the maximum number of requests per window, and `remaining` is how many are left. This information is updated automatically after every other tool call.
 
 ### Information & Pricing
 
@@ -196,8 +203,26 @@ Errors are returned as tool results (not thrown as exceptions), so the LLM can r
 | `WRONG_COUNTRY` | Invalid or missing country ID |
 | `WRONG_ACTIVATION_ID` | Invalid activation ID |
 | `EARLY_CANCEL_DENIED` | Cannot cancel within 5 minutes of ordering |
-| `BANNED` | Account is blocked |
+| `BANNED` | Account is blocked or rate-limited (HTTP 429) |
+| `CONCURRENT_LIMIT` | Concurrent activation limit reached (HTTP 429) |
 | `NO_ACTIVATION` | No activation found with the given ID |
+
+### Rate Limiting
+
+The API enforces rate limits and returns `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers on every response. When the rate limit is exceeded (HTTP 429), the API returns a `Retry-After` header indicating how many seconds to wait before retrying.
+
+The MCP server captures these headers automatically. Use the `get_rate_limit_info` tool to check your current rate limit status at any time. When a rate limit error occurs, the error response includes:
+
+```json
+{
+  "error": "BANNED",
+  "message": "Account or IP has been banned",
+  "httpStatus": 429,
+  "retryAfter": 60,
+  "rateLimitLimit": 100,
+  "rateLimitRemaining": 0
+}
+```
 
 ## Installation Guides
 
