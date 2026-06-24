@@ -63,10 +63,10 @@ VirtualSMS supports multiple upstream providers behind aliases:
 
 | Alias | Description |
 |-------|-------------|
-| `alpha` | Default provider (alpha provider) |
-| `prime` | prime provider |
-| `gamma` | gamma provider |
-| `zeta` | zeta provider |
+| `alpha` | Default provider |
+| `prime` | Alternate provider |
+| `gamma` | Alternate provider |
+| `zeta` | Alternate provider |
 
 If `VIRTUALSMS_POOL_PROVIDER` is not set, the platform auto-routes to the best available provider. You can override it per-call using the `poolProvider` parameter on most tools.
 

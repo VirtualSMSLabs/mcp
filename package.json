@@ -1,6 +1,6 @@
 {
   "name": "@virtualsmslabs/mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MCP server for the VirtualSMS API — integrate SMS verification into any MCP-compatible IDE.",
   "type": "module",
   "main": "build/index.js",
@@ -17,6 +17,7 @@
     "dev": "tsc --watch",
     "start": "node build/index.js",
     "test": "bun test tests/",
+    "prepublishOnly": "node -e \"require('fs').rmSync('build',{recursive:true,force:true})\" && tsc",
     "inspector": "npx @modelcontextprotocol/inspector node build/index.js"
   },
   "keywords": [
